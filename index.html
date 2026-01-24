@@ -16,16 +16,7 @@
 
     <!-- --- Scanner Tab --- -->
     <section id="scanner" class="tab-content active">
-      <video id="camera" autoplay playsinline></video>
-      <canvas id="cameraCanvas" style="display:none;"></canvas>
-
-      <div class="camera-controls">
-        <button id="flashBtn">Toggle Flash</button>
-        <button id="zoomIn">Zoom +</button>
-        <button id="zoomOut">Zoom -</button>
-      </div>
-
-      <div id="lightWarning" class="hidden">Too dark! Consider using flash.</div>
+      <button id="openCamera" class="camera-open-btn">Open Camera</button>
     </section>
 
     <!-- --- History Tab --- -->
@@ -33,6 +24,19 @@
       <ul id="historyList"></ul>
       <button id="clearHistory">Clear History</button>
     </section>
+
+    <!-- --- Full-screen Camera Overlay --- -->
+    <div id="cameraOverlay" class="hidden">
+      <video id="camera" autoplay playsinline></video>
+      <canvas id="cameraCanvas" style="display:none;"></canvas>
+
+      <div class="camera-overlay-controls">
+        <button id="flashBtn">Toggle Flash</button>
+        <button id="closeCamera">Close Camera</button>
+      </div>
+
+      <div id="lightWarning" class="hidden">Too dark! Consider using flash.</div>
+    </div>
   </div>
 
   <!-- --- App JS --- -->

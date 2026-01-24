@@ -1,160 +1,47 @@
-/* src/styles/styles.css */
+/* Base reset */
+* { box-sizing: border-box; margin:0; padding:0; }
+body { font-family: 'Segoe UI', sans-serif; background: #f5f6fa; color:#333; }
 
-/* --- Reset & Base --- */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* App container */
+#app { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+/* Tabs */
+nav { display: flex; gap: 10px; margin-bottom: 15px; }
+.tab-btn { flex:1; padding:10px 0; border:none; background:#e0e0e0; font-weight:bold; cursor:pointer; border-radius:5px 5px 0 0; transition:0.2s;}
+.tab-btn.active { background:#1e90ff; color:#fff; }
+.tab-btn:hover:not(.active) { background:#b0c4de; }
+
+/* Tab content */
+.tab-content { display:none; background:#fff; padding:15px; border-radius:0 5px 5px 5px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+.tab-content.active { display:block; }
+
+/* Open Camera Button */
+.camera-open-btn { padding: 10px 15px; background:#1e90ff; color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold; }
+.camera-open-btn:hover { background:#0f78d1; }
+
+/* Full-screen camera overlay */
+#cameraOverlay {
+  position: fixed; top:0; left:0; width:100%; height:100%; background:#000; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:1000;
+}
+#cameraOverlay.hidden { display:none; }
+
+#camera { width:100%; height:100%; object-fit:cover; }
+
+.camera-overlay-controls {
+  position: absolute; top:10px; right:10px; display:flex; gap:10px; z-index:1001;
 }
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f5f6fa;
-  color: #333;
-  min-height: 100vh;
+.camera-overlay-controls button {
+  padding:10px 15px; background:#1e90ff; color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold;
 }
+.camera-overlay-controls button:hover { background:#0f78d1; }
 
-/* --- App Container --- */
-#app {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
-}
+#lightWarning { position:absolute; bottom:20px; color:#ff4d4d; font-weight:bold; }
+.hidden { display:none; }
 
-/* --- Tabs --- */
-nav {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.tab-btn {
-  flex: 1;
-  padding: 10px 0;
-  border: none;
-  background-color: #e0e0e0;
-  color: #333;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 5px 5px 0 0;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.tab-btn.active {
-  background-color: #1e90ff;
-  color: #fff;
-}
-
-.tab-btn:hover:not(.active) {
-  background-color: #b0c4de;
-}
-
-/* --- Tab Content --- */
-.tab-content {
-  display: none;
-  background-color: #fff;
-  padding: 15px;
-  border-radius: 0 5px 5px 5px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.tab-content.active {
-  display: block;
-}
-
-/* --- Video / Camera --- */
-#scanner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-#camera {
-  width: 100%;
-  max-width: 640px;
-  height: auto;
-  border-radius: 10px;
-  background-color: #000;
-  margin-bottom: 10px;
-}
-
-.camera-controls {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.camera-controls button {
-  padding: 10px 15px;
-  border: none;
-  background-color: #1e90ff;
-  color: #fff;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s ease;
-}
-
-.camera-controls button:hover {
-  background-color: #0f78d1;
-}
-
-/* --- Light Warning --- */
-#lightWarning {
-  color: #ff4d4d;
-  font-weight: bold;
-  margin-top: 5px;
-}
-
-.hidden {
-  display: none;
-}
-
-/* --- History Tab --- */
-#historyList {
-  list-style: none;
-  padding-left: 0;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-#historyList li {
-  padding: 8px 12px;
-  border-bottom: 1px solid #ddd;
-  background-color: #fafafa;
-  border-radius: 5px;
-  margin-bottom: 5px;
-}
-
-#historyList li:focus,
-#historyList li:active {
-  outline: 2px solid #1e90ff;
-  background-color: #e0f0ff;
-}
-
-#clearHistory {
-  margin-top: 10px;
-  padding: 10px 15px;
-  border: none;
-  background-color: #ff4d4d;
-  color: #fff;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-#clearHistory:hover {
-  background-color: #cc0000;
-}
-
-/* --- Responsive --- */
-@media (max-width: 700px) {
-  .camera-controls {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .camera-controls button {
-    width: 100%;
-  }
-}
+/* History */
+#historyList { list-style:none; max-height:400px; overflow-y:auto; margin-top:10px; }
+#historyList li { padding:8px 12px; border-bottom:1px solid #ddd; border-radius:5px; background:#fafafa; margin-bottom:5px; }
+#historyList li:focus, #historyList li:active { outline:2px solid #1e90ff; background:#e0f0ff; }
+#clearHistory { margin-top:10px; padding:10px 15px; border:none; background:#ff4d4d; color:#fff; border-radius:5px; cursor:pointer; font-weight:bold; }
+#clearHistory:hover { background:#cc0000; }

@@ -1,5 +1,3 @@
-// src/scripts/app.ts
-
 // Custom interfaces for advanced camera constraints
 interface AdvancedCameraConstraints {
   focusMode?: 'auto' | 'manual';
@@ -20,32 +18,35 @@ class EbayCheckerApp {
   private video!: HTMLVideoElement;
   private canvas!: HTMLCanvasElement;
   private historyList!: HTMLUListElement;
+  private cameraOverlay!: HTMLDivElement;
   private stream: MediaStream | null = null;
   private track: CameraTrack | null = null;
   private flashOn: boolean = false;
   private zoomLevel: number = 1;
+
+  private initialPinchDistance: number | null = null;
+  private initialZoom: number = 1;
 
   constructor() {
     document.addEventListener('DOMContentLoaded', () => {
       this.video = document.getElementById('camera') as HTMLVideoElement;
       this.canvas = document.getElementById('cameraCanvas') as HTMLCanvasElement;
       this.historyList = document.getElementById('historyList') as HTMLUListElement;
+      this.cameraOverlay = document.getElementById('cameraOverlay') as HTMLDivElement;
 
       this.setupTabs();
       this.setupCameraControls();
+      this.setupOpenCamera();
       this.loadHistory();
-      this.initCamera();
     });
   }
 
-  // --- Tabs ---
   private setupTabs() {
     const buttons = document.querySelectorAll<HTMLButtonElement>('.tab-btn');
     buttons.forEach(btn => {
       btn.addEventListener('click', () => {
         buttons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-
         document.querySelectorAll<HTMLElement>('.tab-content').forEach(tab => tab.classList.remove('active'));
         const target = document.getElementById(btn.dataset.tab!);
         target?.classList.add('active');
@@ -53,65 +54,88 @@ class EbayCheckerApp {
     });
   }
 
-  // --- Camera ---
-  private async initCamera() {
+  private setupOpenCamera() {
+    document.getElementById('openCamera')?.addEventListener('click', () => this.openCamera());
+  }
+
+  private async openCamera() {
+    this.cameraOverlay.classList.remove('hidden');
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { exact: 'environment' } },
         audio: false
       });
-
       this.video.srcObject = this.stream;
-
       this.track = this.stream.getVideoTracks()[0] as CameraTrack;
 
       // Tap to focus
       this.video.addEventListener('click', e => this.handleFocus(e));
 
-      // Start brightness check
+      // Pinch-to-zoom
+      this.video.addEventListener('touchstart', e => this.onTouchStart(e));
+      this.video.addEventListener('touchmove', e => this.onTouchMove(e));
+
       requestAnimationFrame(() => this.checkBrightness());
     } catch (err) {
-      console.error('Camera initialization failed:', err);
+      console.error('Camera failed:', err);
     }
   }
 
   private handleFocus(event: MouseEvent) {
     if (!this.track) return;
-    const capabilities = this.track.getCapabilities();
-
-    if (capabilities.focusMode?.includes('manual')) {
+    const caps = this.track.getCapabilities();
+    if (caps.focusMode?.includes('manual')) {
       this.track.applyConstraints({ advanced: [{ focusMode: 'manual' }] });
-      console.log('Tap-to-focus triggered.');
+      console.log('Tap-to-focus');
     }
   }
 
   private async toggleFlash() {
     if (!this.track) return;
-    const capabilities = this.track.getCapabilities();
-
-    if (capabilities.torch) {
+    const caps = this.track.getCapabilities();
+    if (caps.torch) {
       this.flashOn = !this.flashOn;
       await this.track.applyConstraints({ advanced: [{ torch: this.flashOn }] });
     }
   }
 
-  private adjustZoom(delta: number) {
-    if (!this.track) return;
-    const capabilities = this.track.getCapabilities();
-
-    if (capabilities.zoom) {
-      this.zoomLevel = Math.min(capabilities.zoom.max, Math.max(capabilities.zoom.min, this.zoomLevel + delta));
-      this.track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
+  private onTouchStart(e: TouchEvent) {
+    if (e.touches.length === 2) {
+      this.initialPinchDistance = this.getDistance(e.touches[0], e.touches[1]);
+      this.initialZoom = this.zoomLevel;
     }
+  }
+
+  private onTouchMove(e: TouchEvent) {
+    if (e.touches.length === 2 && this.initialPinchDistance !== null && this.track) {
+      const currentDistance = this.getDistance(e.touches[0], e.touches[1]);
+      const factor = currentDistance / this.initialPinchDistance;
+      const caps = this.track.getCapabilities();
+      if (caps.zoom) {
+        this.zoomLevel = Math.min(caps.zoom.max, Math.max(caps.zoom.min, this.initialZoom * factor));
+        this.track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
+      }
+    }
+  }
+
+  private getDistance(t1: Touch, t2: Touch) {
+    return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
   }
 
   private setupCameraControls() {
     document.getElementById('flashBtn')?.addEventListener('click', () => this.toggleFlash());
-    document.getElementById('zoomIn')?.addEventListener('click', () => this.adjustZoom(0.1));
-    document.getElementById('zoomOut')?.addEventListener('click', () => this.adjustZoom(-0.1));
+    document.getElementById('closeCamera')?.addEventListener('click', () => this.closeCamera());
   }
 
-  // --- Light monitoring ---
+  private closeCamera() {
+    if (this.stream) {
+      this.stream.getTracks().forEach(track => track.stop());
+      this.stream = null;
+      this.track = null;
+    }
+    this.cameraOverlay.classList.add('hidden');
+  }
+
   private checkBrightness() {
     if (!this.video) return;
     const ctx = this.canvas.getContext('2d');
@@ -135,11 +159,9 @@ class EbayCheckerApp {
     requestAnimationFrame(() => this.checkBrightness());
   }
 
-  // --- History ---
   private loadHistory() {
     const items = JSON.parse(localStorage.getItem('ebayHistory') || '[]');
     items.forEach((item: string) => this.addHistoryItem(item));
-
     document.getElementById('clearHistory')?.addEventListener('click', () => {
       localStorage.removeItem('ebayHistory');
       this.historyList.innerHTML = '';
@@ -154,5 +176,4 @@ class EbayCheckerApp {
   }
 }
 
-// Initialize app
 new EbayCheckerApp();
