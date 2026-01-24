@@ -1,109 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>eBay Checker</title>
-
-  <!-- Mobile-first -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="styles/styles.css" />
+  <link rel="stylesheet" href="src/styles/styles.css">
 </head>
 <body>
+  <div id="app">
+    <nav>
+      <button data-tab="scanner" class="tab-btn active">Scanner</button>
+      <button data-tab="history" class="tab-btn">History</button>
+    </nav>
 
-  <!-- CAMERA TAB -->
-  <section id="camera-tab" class="tab active">
-    <video id="camera-video" autoplay playsinline></video>
-
-    <div class="camera-controls">
-      <button id="camera-start">Start Camera</button>
-      <button id="capture-button" disabled>Capture</button>
-    </div>
-
-    <canvas id="capture-canvas" hidden></canvas>
-
-    <!-- MINI CALCULATOR -->
-    <section class="mini-calculator">
-      <h3>Quick Profit Calculator</h3>
-
-      <div class="recommended">
-        Recommended Price:
-        <strong>$<span id="mini-recommended-price">—</span></strong>
+    <section id="scanner" class="tab-content active">
+      <video id="camera" autoplay playsinline></video>
+      <canvas id="cameraCanvas" style="display:none;"></canvas>
+      <div class="camera-controls">
+        <button id="flashBtn">Toggle Flash</button>
+        <button id="zoomIn">Zoom +</button>
+        <button id="zoomOut">Zoom -</button>
       </div>
-
-      <label>
-        Sale Price
-        <input id="mini-sale-price" type="number" step="0.01" />
-      </label>
-
-      <label>
-        Item Cost
-        <input id="mini-item-cost" type="number" step="0.01" />
-      </label>
-
-      <label>
-        eBay Fee %
-        <input id="mini-fee-percent" type="number" step="0.1" />
-      </label>
-
-      <button id="mini-calc-btn">Calculate</button>
-
-      <div class="mini-result">
-        Net Profit:
-        <strong>$<span id="mini-net-profit">0.00</span></strong>
-      </div>
-
-      <button id="mini-add-cart">Add to Cart</button>
-
-      <div class="cart-summary">
-        Cart Total Profit:
-        <strong>$<span id="cart-total">0.00</span></strong>
-      </div>
+      <div id="lightWarning" class="hidden">Too dark! Consider using flash.</div>
     </section>
-  </section>
 
-  <!-- FULL CALCULATOR TAB -->
-  <section id="calculator-tab" class="tab">
-    <h3>Full Profit Calculator</h3>
+    <section id="history" class="tab-content">
+      <ul id="historyList"></ul>
+      <button id="clearHistory">Clear History</button>
+    </section>
+  </div>
 
-    <label>Sale Price <input id="input-sale-price" type="number" step="0.01" /></label>
-    <label>Shipping Charged <input id="input-shipping-charged" type="number" step="0.01" /></label>
-    <label>Item Cost <input id="input-item-cost" type="number" step="0.01" /></label>
-    <label>Shipping Cost <input id="input-shipping-cost" type="number" step="0.01" /></label>
-    <label>eBay Fee % <input id="input-fee-percent" type="number" step="0.1" /></label>
-    <label>Fixed Fee <input id="input-fixed-fee" type="number" step="0.01" /></label>
-
-    <button id="full-calc-btn">Calculate</button>
-
-    <div class="full-results">
-      <div>Total Fees: $<span id="total-fees">0.00</span></div>
-      <div>Net Profit: $<span id="net-profit">0.00</span></div>
-    </div>
-  </section>
-
-  <!-- HISTORY TAB -->
-  <section id="history-tab" class="tab">
-    <h3>Scan History</h3>
-
-    <input
-      id="history-search"
-      type="text"
-      placeholder="Search by price..."
-    />
-
-    <div id="history-list" class="history-list"></div>
-  </section>
-
-  <!-- BOTTOM NAV -->
-  <nav class="bottom-nav">
-    <button id="nav-camera" class="active">Camera</button>
-    <button id="nav-calculator">Calculator</button>
-    <button id="nav-history">History</button>
-  </nav>
-
-  <!-- SCRIPT (compiled output) -->
-  <script src="scripts/app.js" defer></script>
-
+  <script src="src/scripts/app.js" defer></script>
 </body>
 </html>

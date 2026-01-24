@@ -1,276 +1,158 @@
-document.addEventListener("DOMContentLoaded", () => {
+// src/scripts/app.ts
 
-  /* ───────────────────────────────
-     TYPES & STATE
-  ─────────────────────────────── */
+// Custom interfaces for advanced camera constraints
+interface AdvancedCameraConstraints {
+  focusMode?: 'auto' | 'manual';
+  torch?: boolean;
+  zoom?: number;
+}
 
-  type Tab = "camera" | "calculator" | "history";
-
-  interface AppState {
-    activeTab: Tab;
-    stream: MediaStream | null;
-    cartTotal: number;
-  }
-
-  interface HistoryEntry {
-    imageData: string;
-    price: number;
-    date: string;
-  }
-
-  const HISTORY_KEY = "ebayCheckerHistory";
-
-  const state: AppState = {
-    activeTab: "camera",
-    stream: null,
-    cartTotal: 0
+interface CameraTrack extends MediaStreamTrack {
+  applyConstraints(constraints: MediaTrackConstraints & { advanced?: AdvancedCameraConstraints[] }): Promise<void>;
+  getCapabilities(): MediaTrackCapabilities & {
+    focusMode?: string[];
+    torch?: boolean;
+    zoom?: { min: number; max: number; step: number };
   };
+}
 
-  /* ───────────────────────────────
-     DOM HELPERS
-  ─────────────────────────────── */
+class EbayCheckerApp {
+  private video!: HTMLVideoElement;
+  private canvas!: HTMLCanvasElement;
+  private historyList!: HTMLUListElement;
+  private stream: MediaStream | null = null;
+  private track: CameraTrack | null = null;
+  private flashOn: boolean = false;
+  private zoomLevel: number = 1;
 
-  function byId<T extends HTMLElement>(id: string): T {
-    const el = document.getElementById(id);
-    if (!el) throw new Error(`Missing element: ${id}`);
-    return el as T;
+  constructor() {
+    document.addEventListener('DOMContentLoaded', () => {
+      this.video = document.getElementById('camera') as HTMLVideoElement;
+      this.canvas = document.getElementById('cameraCanvas') as HTMLCanvasElement;
+      this.historyList = document.getElementById('historyList') as HTMLUListElement;
+
+      this.setupTabs();
+      this.setupCameraControls();
+      this.loadHistory();
+      this.initCamera();
+    });
   }
 
-  function toNumber(val: string): number {
-    const n = parseFloat(val);
-    return isNaN(n) ? 0 : n;
+  // --- Tabs ---
+  private setupTabs() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.tab-btn');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        document.querySelectorAll<HTMLElement>('.tab-content').forEach(tab => tab.classList.remove('active'));
+        const target = document.getElementById(btn.dataset.tab!);
+        target?.classList.add('active');
+      });
+    });
   }
 
-  /* ───────────────────────────────
-     ELEMENTS
-  ─────────────────────────────── */
-
-  // Tabs
-  const cameraTab = byId<HTMLElement>("camera-tab");
-  const calculatorTab = byId<HTMLElement>("calculator-tab");
-  const historyTab = byId<HTMLElement>("history-tab");
-
-  const navCamera = byId<HTMLButtonElement>("nav-camera");
-  const navCalculator = byId<HTMLButtonElement>("nav-calculator");
-  const navHistory = byId<HTMLButtonElement>("nav-history");
-
-  // Camera
-  const video = byId<HTMLVideoElement>("camera-video");
-  const startCameraBtn = byId<HTMLButtonElement>("camera-start");
-  const captureBtn = byId<HTMLButtonElement>("capture-button");
-  const canvas = byId<HTMLCanvasElement>("capture-canvas");
-  const ctx = canvas.getContext("2d")!;
-
-  // Mini calculator
-  const miniSale = byId<HTMLInputElement>("mini-sale-price");
-  const miniCost = byId<HTMLInputElement>("mini-item-cost");
-  const miniFee = byId<HTMLInputElement>("mini-fee-percent");
-  const miniNet = byId<HTMLElement>("mini-net-profit");
-  const miniCalcBtn = byId<HTMLButtonElement>("mini-calc-btn");
-  const miniAddCart = byId<HTMLButtonElement>("mini-add-cart");
-  const miniRecommended = byId<HTMLElement>("mini-recommended-price");
-  const cartTotalSpan = byId<HTMLElement>("cart-total");
-
-  // Full calculator
-  const salePrice = byId<HTMLInputElement>("input-sale-price");
-  const shippingCharged = byId<HTMLInputElement>("input-shipping-charged");
-  const itemCost = byId<HTMLInputElement>("input-item-cost");
-  const shippingCost = byId<HTMLInputElement>("input-shipping-cost");
-  const feePercent = byId<HTMLInputElement>("input-fee-percent");
-  const fixedFee = byId<HTMLInputElement>("input-fixed-fee");
-  const totalFeesSpan = byId<HTMLElement>("total-fees");
-  const netProfitSpan = byId<HTMLElement>("net-profit");
-  const fullCalcBtn = byId<HTMLButtonElement>("full-calc-btn");
-
-  // History
-  const historyList = byId<HTMLElement>("history-list");
-  const historySearch = byId<HTMLInputElement>("history-search");
-
-  /* ───────────────────────────────
-     TAB MANAGEMENT
-  ─────────────────────────────── */
-
-  function setActiveTab(tab: Tab) {
-    state.activeTab = tab;
-
-    cameraTab.classList.toggle("active", tab === "camera");
-    calculatorTab.classList.toggle("active", tab === "calculator");
-    historyTab.classList.toggle("active", tab === "history");
-
-    navCamera.classList.toggle("active", tab === "camera");
-    navCalculator.classList.toggle("active", tab === "calculator");
-    navHistory.classList.toggle("active", tab === "history");
-
-    if (tab !== "camera") stopCamera();
-  }
-
-  navCamera.onclick = () => setActiveTab("camera");
-  navCalculator.onclick = () => setActiveTab("calculator");
-  navHistory.onclick = () => setActiveTab("history");
-
-  /* ───────────────────────────────
-     CAMERA (HARDENED)
-  ─────────────────────────────── */
-
-  async function startCamera() {
-    if (state.stream) return;
-
+  // --- Camera ---
+  private async initCamera() {
     try {
-      state.stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: "environment" } },
+      this.stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: 'environment' } },
         audio: false
       });
 
-      video.srcObject = state.stream;
-      await video.play();
-      captureBtn.disabled = false;
+      this.video.srcObject = this.stream;
+
+      this.track = this.stream.getVideoTracks()[0] as CameraTrack;
+
+      // Tap to focus
+      this.video.addEventListener('click', e => this.handleFocus(e));
+
+      // Start brightness check
+      requestAnimationFrame(() => this.checkBrightness());
     } catch (err) {
-      alert("Camera access failed. Please allow permissions.");
-      console.error(err);
+      console.error('Camera initialization failed:', err);
     }
   }
 
-  function stopCamera() {
-    if (!state.stream) return;
+  private handleFocus(event: MouseEvent) {
+    if (!this.track) return;
+    const capabilities = this.track.getCapabilities();
 
-    state.stream.getTracks().forEach(t => t.stop());
-    state.stream = null;
-    video.srcObject = null;
-    captureBtn.disabled = true;
-  }
-
-  startCameraBtn.onclick = () => startCamera();
-
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      stopCamera();
-    } else if (state.activeTab === "camera") {
-      startCamera();
+    if (capabilities.focusMode?.includes('manual')) {
+      this.track.applyConstraints({ advanced: [{ focusMode: 'manual' }] });
+      console.log('Tap-to-focus triggered.');
     }
-  });
-
-  /* ───────────────────────────────
-     IMAGE CAPTURE + MOCK ANALYSIS
-  ─────────────────────────────── */
-
-  function detectItemType(): string {
-    const types = ["Electronics", "Clothing", "Books"];
-    return types[Math.floor(Math.random() * types.length)];
   }
 
-  function suggestedFee(type: string): number {
-    if (type === "Electronics") return 12;
-    if (type === "Clothing") return 10;
-    return 15;
+  private async toggleFlash() {
+    if (!this.track) return;
+    const capabilities = this.track.getCapabilities();
+
+    if (capabilities.torch) {
+      this.flashOn = !this.flashOn;
+      await this.track.applyConstraints({ advanced: [{ torch: this.flashOn }] });
+    }
   }
 
-  function suggestedPrice(cost: number, type: string): number {
-    if (type === "Electronics") return cost * 1.25;
-    if (type === "Clothing") return cost * 1.5;
-    return cost * 1.2;
+  private adjustZoom(delta: number) {
+    if (!this.track) return;
+    const capabilities = this.track.getCapabilities();
+
+    if (capabilities.zoom) {
+      this.zoomLevel = Math.min(capabilities.zoom.max, Math.max(capabilities.zoom.min, this.zoomLevel + delta));
+      this.track.applyConstraints({ advanced: [{ zoom: this.zoomLevel }] });
+    }
   }
 
-  captureBtn.onclick = () => {
-    if (!video.videoWidth || !video.videoHeight) return;
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    ctx.drawImage(video, 0, 0);
-
-    const type = detectItemType();
-    const cost = toNumber(miniCost.value);
-
-    miniFee.value = suggestedFee(type).toString();
-    miniRecommended.textContent = suggestedPrice(cost, type).toFixed(2);
-
-    calculateMini();
-  };
-
-  /* ───────────────────────────────
-     MINI CALCULATOR
-  ─────────────────────────────── */
-
-  function calculateMini() {
-    const sale = toNumber(miniSale.value);
-    const cost = toNumber(miniCost.value);
-    const fee = toNumber(miniFee.value);
-
-    const net = sale - cost - (sale * fee / 100);
-    miniNet.textContent = net.toFixed(2);
+  private setupCameraControls() {
+    document.getElementById('flashBtn')?.addEventListener('click', () => this.toggleFlash());
+    document.getElementById('zoomIn')?.addEventListener('click', () => this.adjustZoom(0.1));
+    document.getElementById('zoomOut')?.addEventListener('click', () => this.adjustZoom(-0.1));
   }
 
-  miniCalcBtn.onclick = calculateMini;
+  // --- Light monitoring ---
+  private checkBrightness() {
+    if (!this.video) return;
+    const ctx = this.canvas.getContext('2d');
+    if (!ctx) return;
 
-  /* ───────────────────────────────
-     CART + HISTORY
-  ─────────────────────────────── */
+    this.canvas.width = this.video.videoWidth;
+    this.canvas.height = this.video.videoHeight;
+    ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
+    const data = ctx.getImageData(0, 0, this.canvas.width, this.canvas.height).data;
 
-  function loadHistory(): HistoryEntry[] {
-    const raw = localStorage.getItem(HISTORY_KEY);
-    return raw ? JSON.parse(raw) : [];
+    let sum = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      sum += (data[i] + data[i + 1] + data[i + 2]) / 3;
+    }
+    const brightness = sum / (data.length / 4);
+
+    const warning = document.getElementById('lightWarning');
+    if (brightness < 60) warning?.classList.remove('hidden');
+    else warning?.classList.add('hidden');
+
+    requestAnimationFrame(() => this.checkBrightness());
   }
 
-  function saveHistory(data: HistoryEntry[]) {
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(data));
-  }
+  // --- History ---
+  private loadHistory() {
+    const items = JSON.parse(localStorage.getItem('ebayHistory') || '[]');
+    items.forEach((item: string) => this.addHistoryItem(item));
 
-  let history: HistoryEntry[] = loadHistory();
-
-  function renderHistory(filter = "") {
-    historyList.innerHTML = "";
-
-    history
-      .filter(h => h.price.toString().includes(filter))
-      .forEach(h => {
-        const div = document.createElement("div");
-        div.className = "history-item";
-        div.innerHTML = `
-          <img src="${h.imageData}" width="80" />
-          <div>
-            $${h.price.toFixed(2)}<br/>
-            ${new Date(h.date).toLocaleString()}
-          </div>
-        `;
-        historyList.appendChild(div);
-      });
-  }
-
-  renderHistory();
-
-  miniAddCart.onclick = () => {
-    const profit = parseFloat(miniNet.textContent || "0");
-    state.cartTotal += profit;
-    cartTotalSpan.textContent = state.cartTotal.toFixed(2);
-
-    history.unshift({
-      imageData: canvas.toDataURL("image/jpeg", 0.6),
-      price: toNumber(miniSale.value),
-      date: new Date().toISOString()
+    document.getElementById('clearHistory')?.addEventListener('click', () => {
+      localStorage.removeItem('ebayHistory');
+      this.historyList.innerHTML = '';
     });
+  }
 
-    saveHistory(history);
-    renderHistory();
-  };
+  private addHistoryItem(item: string) {
+    const li = document.createElement('li');
+    li.textContent = item;
+    li.contentEditable = 'true';
+    this.historyList.appendChild(li);
+  }
+}
 
-  historySearch.oninput = () => renderHistory(historySearch.value);
-
-  /* ───────────────────────────────
-     FULL CALCULATOR
-  ─────────────────────────────── */
-
-  fullCalcBtn.onclick = () => {
-    const sale = toNumber(salePrice.value);
-    const shipIn = toNumber(shippingCharged.value);
-    const cost = toNumber(itemCost.value);
-    const shipOut = toNumber(shippingCost.value);
-    const feePct = toNumber(feePercent.value);
-    const fixed = toNumber(fixedFee.value);
-
-    const fees = (sale * feePct / 100) + fixed;
-    const net = sale + shipIn - cost - shipOut - fees;
-
-    totalFeesSpan.textContent = fees.toFixed(2);
-    netProfitSpan.textContent = net.toFixed(2);
-  };
-
-});
+// Initialize app
+new EbayCheckerApp();
