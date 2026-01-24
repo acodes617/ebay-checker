@@ -8,28 +8,34 @@
 </head>
 <body>
   <div id="app">
+    <!-- --- Tabs --- -->
     <nav>
       <button data-tab="scanner" class="tab-btn active">Scanner</button>
       <button data-tab="history" class="tab-btn">History</button>
     </nav>
 
+    <!-- --- Scanner Tab --- -->
     <section id="scanner" class="tab-content active">
       <video id="camera" autoplay playsinline></video>
       <canvas id="cameraCanvas" style="display:none;"></canvas>
+
       <div class="camera-controls">
         <button id="flashBtn">Toggle Flash</button>
         <button id="zoomIn">Zoom +</button>
         <button id="zoomOut">Zoom -</button>
       </div>
+
       <div id="lightWarning" class="hidden">Too dark! Consider using flash.</div>
     </section>
 
+    <!-- --- History Tab --- -->
     <section id="history" class="tab-content">
       <ul id="historyList"></ul>
       <button id="clearHistory">Clear History</button>
     </section>
   </div>
 
+  <!-- --- App JS --- -->
   <script src="src/scripts/app.js" defer></script>
 </body>
 </html>
