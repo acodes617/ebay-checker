@@ -1,13 +1,13 @@
 /* Reset & Base */
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', sans-serif; background: #f5f6fa; color:#333; }
+body { font-family: 'Segoe UI', sans-serif; background:#f5f6fa; color:#333; }
 
 /* App container */
-#app { max-width: 900px; margin: 0 auto; padding: 20px; }
+#app { max-width:900px; margin:0 auto; padding:20px; }
 
 /* Tabs */
-nav { display: flex; gap: 10px; margin-bottom: 15px; }
-.tab-btn { flex:1; padding:10px 0; border:none; background:#e0e0e0; font-weight:bold; cursor:pointer; border-radius:5px 5px 0 0; transition:0.2s;}
+nav { display:flex; gap:10px; margin-bottom:15px; }
+.tab-btn { flex:1; padding:10px 0; border:none; background:#e0e0e0; font-weight:bold; cursor:pointer; border-radius:5px 5px 0 0; transition:0.2s; }
 .tab-btn.active { background:#1e90ff; color:#fff; }
 .tab-btn:hover:not(.active) { background:#b0c4de; }
 
@@ -16,7 +16,7 @@ nav { display: flex; gap: 10px; margin-bottom: 15px; }
 .tab-content.active { display:block; }
 
 /* Open Camera Button */
-.camera-open-btn { padding: 10px 15px; background:#1e90ff; color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold; }
+.camera-open-btn { padding:10px 15px; background:#1e90ff; color:#fff; border:none; border-radius:5px; cursor:pointer; font-weight:bold; }
 .camera-open-btn:hover { background:#0f78d1; }
 
 /* Full-screen camera overlay */
@@ -42,6 +42,13 @@ nav { display: flex; gap: 10px; margin-bottom: 15px; }
 /* History */
 #historyList { list-style:none; max-height:400px; overflow-y:auto; margin-top:10px; }
 #historyList li { padding:8px 12px; border-bottom:1px solid #ddd; border-radius:5px; background:#fafafa; margin-bottom:5px; }
-#historyList li:focus, #historyList li:active { outline:2px solid #1e90ff; background:#e0f0ff; }
 #clearHistory { margin-top:10px; padding:10px 15px; border:none; background:#ff4d4d; color:#fff; border-radius:5px; cursor:pointer; font-weight:bold; }
 #clearHistory:hover { background:#cc0000; }
+
+/* Calculator */
+.calculator { max-width:300px; margin:0 auto; }
+#calcDisplay { width:100%; padding:10px; font-size:1.5em; margin-bottom:10px; text-align:right; border-radius:5px; border:1px solid #ccc; background:#f9f9f9; }
+.calc-buttons { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.calc-buttons button { padding:15px; font-size:1.2em; border:none; border-radius:5px; background:#1e90ff; color:#fff; cursor:pointer; }
+.calc-buttons button:hover { background:#0f78d1; }
+.span2 { grid-column: span 4; }
