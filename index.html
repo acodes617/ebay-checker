@@ -8,24 +8,24 @@
 </head>
 <body>
   <div id="app">
-    <!-- --- Tabs --- -->
+    <!-- Tabs -->
     <nav>
       <button data-tab="scanner" class="tab-btn active">Scanner</button>
       <button data-tab="history" class="tab-btn">History</button>
     </nav>
 
-    <!-- --- Scanner Tab --- -->
+    <!-- Scanner Tab -->
     <section id="scanner" class="tab-content active">
       <button id="openCamera" class="camera-open-btn">Open Camera</button>
     </section>
 
-    <!-- --- History Tab --- -->
+    <!-- History Tab -->
     <section id="history" class="tab-content">
       <ul id="historyList"></ul>
       <button id="clearHistory">Clear History</button>
     </section>
 
-    <!-- --- Full-screen Camera Overlay --- -->
+    <!-- Camera Overlay -->
     <div id="cameraOverlay" class="hidden">
       <video id="camera" autoplay playsinline></video>
       <canvas id="cameraCanvas" style="display:none;"></canvas>
@@ -39,7 +39,6 @@
     </div>
   </div>
 
-  <!-- --- App JS --- -->
   <script src="src/scripts/app.js" defer></script>
 </body>
 </html>
