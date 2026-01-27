@@ -5,34 +5,38 @@
   padding: 0;
 }
 
+/* ===== BASE ===== */
 body {
   font-family: 'Segoe UI', sans-serif;
   background: #f5f6fa;
   color: #333;
 }
 
-/* ===== APP CONTAINER ===== */
 #app {
   max-width: 900px;
   margin: 0 auto;
   padding: 20px;
 }
 
-/* ===== TABS ===== */
+/* ===== TAB NAV ===== */
 nav {
   display: flex;
   gap: 10px;
   margin-bottom: 15px;
+  pointer-events: auto;
 }
 
 .tab-btn {
   flex: 1;
   padding: 10px 0;
-  border: none;
   background: #e0e0e0;
+  border: none;
   font-weight: bold;
+  pointer-events: auto;
   cursor: pointer;
   border-radius: 5px 5px 0 0;
+  position: relative;
+  z-index: 5;
 }
 
 .tab-btn.active {
@@ -47,19 +51,22 @@ nav {
   padding: 15px;
   border-radius: 0 5px 5px 5px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  pointer-events: auto;
 }
 
 .tab-content.active {
   display: block;
 }
 
-/* ===== BUTTONS ===== */
+/* ===== BUTTON GLOBAL ===== */
 button {
-  cursor: pointer;
   pointer-events: auto;
+  cursor: pointer;
+  position: relative;
+  z-index: 5;
 }
 
-/* ===== CAMERA BUTTON ===== */
+/* ===== CAMERA ===== */
 .camera-open-btn {
   padding: 10px 15px;
   background: #1e90ff;
@@ -69,39 +76,39 @@ button {
   font-weight: bold;
 }
 
-/* ===== CAMERA OVERLAY ===== */
+/* Overlay container must not block */
 #cameraOverlay {
   position: fixed;
   inset: 0;
   background: #000;
-  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  z-index: 100;
 }
 
 #cameraOverlay.hidden {
   display: none;
 }
 
-/* 🚨 CRITICAL FIX 🚨 */
+/* Video never blocks pointer */
 #camera {
   width: 100%;
   height: 100%;
   object-fit: cover;
-
-  /* THIS IS THE FIX */
   pointer-events: none;
 }
 
-/* ===== CAMERA CONTROLS ===== */
+/* Overlay controls must receive pointer */
 .camera-overlay-controls {
   position: absolute;
   top: 10px;
   right: 10px;
   display: flex;
   gap: 10px;
-  z-index: 1001;
-
-  /* allow interaction */
   pointer-events: auto;
+  z-index: 110;
 }
 
 .camera-overlay-controls button {
@@ -113,14 +120,14 @@ button {
   font-weight: bold;
 }
 
-/* ===== LIGHT WARNING ===== */
+/* light warning */
 #lightWarning {
   position: absolute;
   bottom: 20px;
   color: #ff4d4d;
   font-weight: bold;
-  z-index: 1001;
   pointer-events: none;
+  z-index: 110;
 }
 
 .hidden {
@@ -145,9 +152,9 @@ button {
 #clearHistory {
   margin-top: 10px;
   padding: 10px 15px;
-  border: none;
   background: #ff4d4d;
   color: #fff;
+  border: none;
   border-radius: 5px;
 }
 
@@ -155,6 +162,7 @@ button {
 .calculator {
   max-width: 300px;
   margin: 0 auto;
+  pointer-events: auto;
 }
 
 #calcDisplay {
@@ -176,10 +184,11 @@ button {
 .calc-buttons button {
   padding: 15px;
   font-size: 1.2em;
-  border: none;
-  border-radius: 5px;
   background: #1e90ff;
   color: #fff;
+  border: none;
+  border-radius: 5px;
+  pointer-events: auto;
 }
 
 .span2 {
