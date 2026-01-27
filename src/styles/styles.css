@@ -1,38 +1,186 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', sans-serif; background:black; color:white; }
-#app { max-width:900px; margin:0 auto; padding:20px; }
+/* ===== RESET ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-/* Tabs */
-nav { display:flex; gap:10px; margin-bottom:15px; pointer-events:auto; }
-.tab-btn { flex:1; padding:10px 0; border:none; cursor:pointer; border-radius:5px 5px 0 0; font-weight:bold; background:#444; color:white; }
-.tab-btn.active { background:#1e90ff; }
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #000; /* 🔥 black background to confirm changes */
+  color: #fff;
+}
 
-/* Tab content */
-.tab-content { display:none; background:#222; padding:15px; border-radius:0 5px 5px 5px; }
-.tab-content.active { display:block; }
+/* ===== APP CONTAINER ===== */
+#app {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
 
-/* Buttons */
-button { cursor:pointer; pointer-events:auto; }
-.camera-open-btn { padding:10px 15px; background:#1e90ff; color:white; border:none; border-radius:5px; font-weight:bold; }
+/* ===== TABS ===== */
+nav {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
 
-/* Camera overlay */
-#cameraOverlay { position:fixed; inset:0; background:black; z-index:1000; display:flex; justify-content:center; align-items:center; flex-direction:column; }
-#cameraOverlay.hidden { display:none; }
-#camera { width:100%; height:100%; object-fit:cover; pointer-events:none; }
-.camera-overlay-controls { position:absolute; top:10px; right:10px; display:flex; gap:10px; pointer-events:auto; z-index:1001; }
-.camera-overlay-controls button { padding:10px 15px; background:#1e90ff; color:white; border:none; border-radius:5px; font-weight:bold; }
+.tab-btn {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  background: #333;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 5px 5px 0 0;
+  color: #fff;
+  pointer-events: auto;
+}
 
-/* Light warning */
-#lightWarning { position:absolute; bottom:20px; color:#ff4d4d; font-weight:bold; z-index:1001; pointer-events:none; }
+.tab-btn.active {
+  background: #1e90ff;
+  color: #fff;
+}
 
-/* Calculator */
-.calculator { max-width:300px; margin:0 auto; }
-#calcDisplay { width:100%; padding:10px; font-size:1.5em; margin-bottom:10px; text-align:right; border-radius:5px; border:1px solid #ccc; }
-.calc-buttons { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
-.calc-buttons button { padding:15px; font-size:1.2em; border:none; border-radius:5px; background:#1e90ff; color:white; }
-.span2 { grid-column:span 4; }
+/* ===== TAB CONTENT ===== */
+.tab-content {
+  display: none;
+  background: #111;
+  padding: 15px;
+  border-radius: 0 5px 5px 5px;
+}
 
-/* History */
-#historyList { list-style:none; max-height:400px; overflow-y:auto; margin-top:10px; }
-#historyList li { padding:8px 12px; border-bottom:1px solid #555; background:#333; margin-bottom:5px; }
-#clearHistory { margin-top:10px; padding:10px 15px; border:none; background:#ff4d4d; color:white; border-radius:5px; }
+.tab-content.active {
+  display: block;
+}
+
+/* ===== BUTTONS ===== */
+button {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* ===== CAMERA BUTTON ===== */
+.camera-open-btn {
+  padding: 10px 15px;
+  background: #1e90ff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+/* ===== CAMERA OVERLAY ===== */
+#cameraOverlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 1000;
+}
+
+#cameraOverlay.hidden {
+  display: none;
+}
+
+/* 🔑 pointer-events fix */
+#camera {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none; /* video no longer blocks buttons */
+}
+
+/* ===== CAMERA CONTROLS ===== */
+.camera-overlay-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 10px;
+  z-index: 1001;
+  pointer-events: auto;
+}
+
+.camera-overlay-controls button {
+  padding: 10px 15px;
+  background: #1e90ff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+/* ===== LIGHT WARNING ===== */
+#lightWarning {
+  position: absolute;
+  bottom: 20px;
+  color: #ff4d4d;
+  font-weight: bold;
+  z-index: 1001;
+  pointer-events: none;
+}
+
+.hidden {
+  display: none;
+}
+
+/* ===== HISTORY ===== */
+#historyList {
+  list-style: none;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+#historyList li {
+  padding: 8px 12px;
+  border-bottom: 1px solid #444;
+  background: #222;
+  margin-bottom: 5px;
+}
+
+#clearHistory {
+  margin-top: 10px;
+  padding: 10px 15px;
+  border: none;
+  background: #ff4d4d;
+  color: #fff;
+  border-radius: 5px;
+}
+
+/* ===== CALCULATOR ===== */
+.calculator {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+#calcDisplay {
+  width: 100%;
+  padding: 10px;
+  font-size: 1.5em;
+  margin-bottom: 10px;
+  text-align: right;
+  border-radius: 5px;
+  border: 1px solid #333;
+  background: #222;
+  color: #fff;
+}
+
+.calc-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.calc-buttons button {
+  padding: 15px;
+  font-size: 1.2em;
+  border: none;
+  border-radius: 5px;
+  background: #1e90ff;
+  color: #fff;
+}
+
+.span2 {
+  grid-column: span 4;
+}
