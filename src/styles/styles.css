@@ -1,78 +1,38 @@
-/* ===== RESET ===== */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background:black; color:white; }
+#app { max-width:900px; margin:0 auto; padding:20px; }
 
-/* ===== BODY BACKGROUND CHANGE ===== */
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background: black; /* 🔥 This is the test change */
-  color: #fff;
-}
+/* Tabs */
+nav { display:flex; gap:10px; margin-bottom:15px; pointer-events:auto; }
+.tab-btn { flex:1; padding:10px 0; border:none; cursor:pointer; border-radius:5px 5px 0 0; font-weight:bold; background:#444; color:white; }
+.tab-btn.active { background:#1e90ff; }
 
-/* ===== APP CONTAINER ===== */
-#app {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
-}
+/* Tab content */
+.tab-content { display:none; background:#222; padding:15px; border-radius:0 5px 5px 5px; }
+.tab-content.active { display:block; }
 
-/* ===== TAB NAV ===== */
-nav {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-  pointer-events: auto;
-}
+/* Buttons */
+button { cursor:pointer; pointer-events:auto; }
+.camera-open-btn { padding:10px 15px; background:#1e90ff; color:white; border:none; border-radius:5px; font-weight:bold; }
 
-.tab-btn {
-  flex: 1;
-  padding: 10px 0;
-  background: #e0e0e0;
-  border: none;
-  font-weight: bold;
-  pointer-events: auto;
-  cursor: pointer;
-  border-radius: 5px 5px 0 0;
-  position: relative;
-  z-index: 5;
-}
+/* Camera overlay */
+#cameraOverlay { position:fixed; inset:0; background:black; z-index:1000; display:flex; justify-content:center; align-items:center; flex-direction:column; }
+#cameraOverlay.hidden { display:none; }
+#camera { width:100%; height:100%; object-fit:cover; pointer-events:none; }
+.camera-overlay-controls { position:absolute; top:10px; right:10px; display:flex; gap:10px; pointer-events:auto; z-index:1001; }
+.camera-overlay-controls button { padding:10px 15px; background:#1e90ff; color:white; border:none; border-radius:5px; font-weight:bold; }
 
-.tab-btn.active {
-  background: #1e90ff;
-  color: #fff;
-}
+/* Light warning */
+#lightWarning { position:absolute; bottom:20px; color:#ff4d4d; font-weight:bold; z-index:1001; pointer-events:none; }
 
-/* ===== TAB CONTENT ===== */
-.tab-content {
-  display: none;
-  background: #222; /* slightly lighter than background so you can see */
-  padding: 15px;
-  border-radius: 0 5px 5px 5px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
-  pointer-events: auto;
-}
+/* Calculator */
+.calculator { max-width:300px; margin:0 auto; }
+#calcDisplay { width:100%; padding:10px; font-size:1.5em; margin-bottom:10px; text-align:right; border-radius:5px; border:1px solid #ccc; }
+.calc-buttons { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.calc-buttons button { padding:15px; font-size:1.2em; border:none; border-radius:5px; background:#1e90ff; color:white; }
+.span2 { grid-column:span 4; }
 
-.tab-content.active {
-  display: block;
-}
-
-/* ===== BUTTONS ===== */
-button {
-  pointer-events: auto;
-  cursor: pointer;
-  position: relative;
-  z-index: 5;
-}
-
-/* ===== CAMERA BUTTON ===== */
-.camera-open-btn {
-  padding: 10px 15px;
-  background: #1e90ff;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
-}
+/* History */
+#historyList { list-style:none; max-height:400px; overflow-y:auto; margin-top:10px; }
+#historyList li { padding:8px 12px; border-bottom:1px solid #555; background:#333; margin-bottom:5px; }
+#clearHistory { margin-top:10px; padding:10px 15px; border:none; background:#ff4d4d; color:white; border-radius:5px; }

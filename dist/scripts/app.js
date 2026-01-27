@@ -13,25 +13,25 @@ class EbayCheckerApp {
         this.setupCalculator();
     }
     setupTabs() {
-        const buttons = document.querySelectorAll(".tab-btn");
+        const tabs = document.querySelectorAll(".tab-btn");
         const contents = document.querySelectorAll(".tab-content");
-        buttons.forEach(btn => {
-            btn.addEventListener("click", () => {
-                buttons.forEach(b => b.classList.remove("active"));
-                btn.classList.add("active");
-                contents.forEach(c => c.classList.remove("active"));
-                const target = document.getElementById(btn.dataset.tab);
-                target?.classList.add("active");
-            });
-        });
+        tabs.forEach(tab => tab.addEventListener("click", () => {
+            tabs.forEach(t => t.classList.remove("active"));
+            tab.classList.add("active");
+            contents.forEach(c => c.classList.remove("active"));
+            const target = document.getElementById(tab.dataset.tab);
+            target?.classList.add("active");
+        }));
     }
     bindButtons() {
-        const openBtn = document.getElementById("openCamera");
-        const closeBtn = document.getElementById("closeCamera");
-        const flashBtn = document.getElementById("flashBtn");
-        openBtn?.addEventListener("click", () => this.openCamera());
-        closeBtn?.addEventListener("click", () => this.closeCamera());
-        flashBtn?.addEventListener("click", () => this.toggleFlash());
+        document.getElementById("openCamera")?.addEventListener("click", () => this.openCamera());
+        document.getElementById("closeCamera")?.addEventListener("click", () => this.closeCamera());
+        document.getElementById("flashBtn")?.addEventListener("click", () => this.toggleFlash());
+        document.getElementById("clearHistory")?.addEventListener("click", () => {
+            const list = document.getElementById("historyList");
+            list.innerHTML = "";
+            localStorage.removeItem("ebayHistory");
+        });
     }
     async openCamera() {
         if (this.stream)
@@ -43,9 +43,9 @@ class EbayCheckerApp {
             this.track = this.stream.getVideoTracks()[0];
             this.overlay.classList.remove("hidden");
         }
-        catch (err) {
-            alert("Camera access failed");
-            console.error(err);
+        catch (e) {
+            alert("Camera failed");
+            console.error(e);
         }
     }
     closeCamera() {
@@ -63,22 +63,16 @@ class EbayCheckerApp {
             this.flashOn = !this.flashOn;
             await this.track.applyConstraints({ advanced: [{ torch: this.flashOn }] });
         }
-        else {
+        else
             alert("Flash not supported");
-        }
     }
     setupCalculator() {
         document.querySelectorAll(".calc-buttons button").forEach(btn => {
             const val = btn.dataset.value;
-            if (val) {
-                btn.addEventListener("click", () => {
-                    this.display.value += val;
-                });
-            }
+            if (val)
+                btn.addEventListener("click", () => this.display.value += val);
         });
-        document.getElementById("calcClear")?.addEventListener("click", () => {
-            this.display.value = "";
-        });
+        document.getElementById("calcClear")?.addEventListener("click", () => this.display.value = "");
         document.getElementById("calcEquals")?.addEventListener("click", () => {
             try {
                 this.display.value = eval(this.display.value);
@@ -89,6 +83,4 @@ class EbayCheckerApp {
         });
     }
 }
-document.addEventListener("DOMContentLoaded", () => {
-    new EbayCheckerApp();
-});
+document.addEventListener("DOMContentLoaded", () => new EbayCheckerApp());
