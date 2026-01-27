@@ -8,8 +8,6 @@
 </head>
 <body>
   <div id="app">
-    <h1 style="color:white; text-align:center;">eBay Checker</h1>
-
     <!-- Tabs -->
     <nav>
       <button data-tab="scanner" class="tab-btn active">Scanner</button>
@@ -32,23 +30,28 @@
     <section id="calculator" class="tab-content">
       <div class="calculator">
         <input type="text" id="calcDisplay" readonly />
+
         <div class="calc-buttons">
           <button data-value="7">7</button>
           <button data-value="8">8</button>
           <button data-value="9">9</button>
           <button data-value="/">÷</button>
+
           <button data-value="4">4</button>
           <button data-value="5">5</button>
           <button data-value="6">6</button>
           <button data-value="*">×</button>
+
           <button data-value="1">1</button>
           <button data-value="2">2</button>
           <button data-value="3">3</button>
           <button data-value="-">−</button>
+
           <button data-value="0">0</button>
           <button data-value=".">.</button>
           <button id="calcClear">C</button>
           <button data-value="+">+</button>
+
           <button id="calcEquals" class="span2">=</button>
         </div>
       </div>
@@ -70,6 +73,7 @@
     </div>
   </div>
 
+  <!-- Correctly points to compiled app.js -->
   <script src="src/scripts/app.js" defer></script>
 </body>
 </html>

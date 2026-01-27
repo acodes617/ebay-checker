@@ -6,46 +6,63 @@ class EbayCheckerApp {
         this.flashOn = false;
         this.video = document.getElementById("camera");
         this.canvas = document.getElementById("cameraCanvas");
-        this.overlay = document.getElementById("cameraOverlay");
+        this.cameraOverlay = document.getElementById("cameraOverlay");
+        this.historyList = document.getElementById("historyList");
         this.display = document.getElementById("calcDisplay");
         this.setupTabs();
         this.bindButtons();
+        this.loadHistory();
         this.setupCalculator();
     }
+    // --------------------
+    // Tabs
+    // --------------------
     setupTabs() {
-        const tabs = document.querySelectorAll(".tab-btn");
-        const contents = document.querySelectorAll(".tab-content");
-        tabs.forEach(tab => tab.addEventListener("click", () => {
-            tabs.forEach(t => t.classList.remove("active"));
-            tab.classList.add("active");
-            contents.forEach(c => c.classList.remove("active"));
-            const target = document.getElementById(tab.dataset.tab);
-            target?.classList.add("active");
-        }));
+        const buttons = document.querySelectorAll(".tab-btn");
+        buttons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                buttons.forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+                const target = document.getElementById(btn.dataset.tab);
+                target?.classList.add("active");
+                if (btn.dataset.tab === "scanner") {
+                    this.openCamera();
+                }
+                else {
+                    this.closeCamera();
+                }
+            });
+        });
     }
+    // --------------------
+    // Button bindings
+    // --------------------
     bindButtons() {
         document.getElementById("openCamera")?.addEventListener("click", () => this.openCamera());
         document.getElementById("closeCamera")?.addEventListener("click", () => this.closeCamera());
         document.getElementById("flashBtn")?.addEventListener("click", () => this.toggleFlash());
         document.getElementById("clearHistory")?.addEventListener("click", () => {
-            const list = document.getElementById("historyList");
-            list.innerHTML = "";
             localStorage.removeItem("ebayHistory");
+            this.historyList.innerHTML = "";
         });
     }
+    // --------------------
+    // Camera
+    // --------------------
     async openCamera() {
         if (this.stream)
             return;
         try {
-            this.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            this.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
             this.video.srcObject = this.stream;
             await this.video.play();
             this.track = this.stream.getVideoTracks()[0];
-            this.overlay.classList.remove("hidden");
+            this.cameraOverlay.classList.remove("hidden");
         }
-        catch (e) {
-            alert("Camera failed");
-            console.error(e);
+        catch (err) {
+            console.error(err);
+            alert("Camera access failed.");
         }
     }
     closeCamera() {
@@ -53,26 +70,49 @@ class EbayCheckerApp {
         this.stream = null;
         this.track = null;
         this.video.srcObject = null;
-        this.overlay.classList.add("hidden");
+        this.cameraOverlay.classList.add("hidden");
     }
+    // --------------------
+    // Flash toggle (TS safe)
+    // --------------------
     async toggleFlash() {
         if (!this.track)
             return;
-        const caps = this.track.getCapabilities?.();
-        if (caps?.torch) {
+        const caps = (this.track.getCapabilities?.() || {});
+        if (caps.torch) {
             this.flashOn = !this.flashOn;
             await this.track.applyConstraints({ advanced: [{ torch: this.flashOn }] });
         }
-        else
+        else {
             alert("Flash not supported");
+        }
     }
+    // --------------------
+    // History
+    // --------------------
+    loadHistory() {
+        const items = JSON.parse(localStorage.getItem("ebayHistory") || "[]");
+        items.forEach(item => {
+            const li = document.createElement("li");
+            li.textContent = item;
+            this.historyList.appendChild(li);
+        });
+    }
+    // --------------------
+    // Calculator
+    // --------------------
     setupCalculator() {
         document.querySelectorAll(".calc-buttons button").forEach(btn => {
-            const val = btn.dataset.value;
-            if (val)
-                btn.addEventListener("click", () => this.display.value += val);
+            const value = btn.dataset.value;
+            if (value) {
+                btn.addEventListener("click", () => {
+                    this.display.value += value;
+                });
+            }
         });
-        document.getElementById("calcClear")?.addEventListener("click", () => this.display.value = "");
+        document.getElementById("calcClear")?.addEventListener("click", () => {
+            this.display.value = "";
+        });
         document.getElementById("calcEquals")?.addEventListener("click", () => {
             try {
                 this.display.value = eval(this.display.value);
@@ -83,4 +123,9 @@ class EbayCheckerApp {
         });
     }
 }
-document.addEventListener("DOMContentLoaded", () => new EbayCheckerApp());
+// --------------------
+// Boot
+// --------------------
+document.addEventListener("DOMContentLoaded", () => {
+    new EbayCheckerApp();
+});
