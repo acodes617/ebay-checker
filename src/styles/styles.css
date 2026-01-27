@@ -1,4 +1,4 @@
-/* Reset & Base */
+/* ===== RESET ===== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -6,19 +6,19 @@
 }
 
 body {
-  font-family: "Segoe UI", sans-serif;
+  font-family: 'Segoe UI', sans-serif;
   background: #f5f6fa;
   color: #333;
 }
 
-/* App container */
+/* ===== APP CONTAINER ===== */
 #app {
   max-width: 900px;
   margin: 0 auto;
   padding: 20px;
 }
 
-/* Tabs */
+/* ===== TABS ===== */
 nav {
   display: flex;
   gap: 10px;
@@ -33,7 +33,6 @@ nav {
   font-weight: bold;
   cursor: pointer;
   border-radius: 5px 5px 0 0;
-  transition: 0.2s;
 }
 
 .tab-btn.active {
@@ -41,45 +40,40 @@ nav {
   color: #fff;
 }
 
-.tab-btn:hover:not(.active) {
-  background: #b0c4de;
-}
-
-/* Tab content */
+/* ===== TAB CONTENT ===== */
 .tab-content {
   display: none;
   background: #fff;
   padding: 15px;
   border-radius: 0 5px 5px 5px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .tab-content.active {
   display: block;
 }
 
-/* Open Camera Button */
+/* ===== BUTTONS ===== */
+button {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* ===== CAMERA BUTTON ===== */
 .camera-open-btn {
   padding: 10px 15px;
   background: #1e90ff;
   color: #fff;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
   font-weight: bold;
 }
 
-/* Full-screen camera overlay */
+/* ===== CAMERA OVERLAY ===== */
 #cameraOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 1000;
 }
 
@@ -87,20 +81,27 @@ nav {
   display: none;
 }
 
+/* 🚨 CRITICAL FIX 🚨 */
 #camera {
   width: 100%;
   height: 100%;
   object-fit: cover;
+
+  /* THIS IS THE FIX */
+  pointer-events: none;
 }
 
-/* Overlay Controls */
+/* ===== CAMERA CONTROLS ===== */
 .camera-overlay-controls {
   position: absolute;
   top: 10px;
   right: 10px;
   display: flex;
   gap: 10px;
-  z-index: 2000;
+  z-index: 1001;
+
+  /* allow interaction */
+  pointer-events: auto;
 }
 
 .camera-overlay-controls button {
@@ -110,22 +111,23 @@ nav {
   border: none;
   border-radius: 5px;
   font-weight: bold;
-  cursor: pointer;
 }
 
-/* Light warning */
+/* ===== LIGHT WARNING ===== */
 #lightWarning {
   position: absolute;
   bottom: 20px;
   color: #ff4d4d;
   font-weight: bold;
+  z-index: 1001;
+  pointer-events: none;
 }
 
 .hidden {
   display: none;
 }
 
-/* History */
+/* ===== HISTORY ===== */
 #historyList {
   list-style: none;
   max-height: 400px;
@@ -135,22 +137,21 @@ nav {
 
 #historyList li {
   padding: 8px 12px;
-  background: #fafafa;
   border-bottom: 1px solid #ddd;
+  background: #fafafa;
   margin-bottom: 5px;
 }
 
 #clearHistory {
   margin-top: 10px;
   padding: 10px 15px;
+  border: none;
   background: #ff4d4d;
   color: #fff;
-  border: none;
   border-radius: 5px;
-  cursor: pointer;
 }
 
-/* Calculator */
+/* ===== CALCULATOR ===== */
 .calculator {
   max-width: 300px;
   margin: 0 auto;
@@ -162,6 +163,8 @@ nav {
   font-size: 1.5em;
   margin-bottom: 10px;
   text-align: right;
+  border-radius: 5px;
+  border: 1px solid #ccc;
 }
 
 .calc-buttons {
@@ -173,24 +176,12 @@ nav {
 .calc-buttons button {
   padding: 15px;
   font-size: 1.2em;
-  background: #1e90ff;
-  color: #fff;
   border: none;
   border-radius: 5px;
-  cursor: pointer;
+  background: #1e90ff;
+  color: #fff;
 }
 
 .span2 {
   grid-column: span 4;
-}
-
-/* ===== CLICK SAFETY (CRITICAL) ===== */
-button {
-  pointer-events: auto;
-  touch-action: manipulation;
-  cursor: pointer;
-}
-
-#cameraOverlay video {
-  pointer-events: none;
 }
