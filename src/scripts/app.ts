@@ -1,47 +1,34 @@
 class EbayCheckerApp {
-  private video!: HTMLVideoElement;
-  private canvas!: HTMLCanvasElement;
-  private cameraOverlay!: HTMLDivElement;
-  private historyList!: HTMLUListElement;
-  private display!: HTMLInputElement;
+  private video: HTMLVideoElement;
+  private canvas: HTMLCanvasElement;
+  private overlay: HTMLDivElement;
+  private display: HTMLInputElement;
 
   private stream: MediaStream | null = null;
   private track: any = null;
   private flashOn = false;
 
   constructor() {
-    console.log("Constructor ran");
-
     this.video = document.getElementById("camera") as HTMLVideoElement;
     this.canvas = document.getElementById("cameraCanvas") as HTMLCanvasElement;
-    this.cameraOverlay = document.getElementById("cameraOverlay") as HTMLDivElement;
-    this.historyList = document.getElementById("historyList") as HTMLUListElement;
+    this.overlay = document.getElementById("cameraOverlay") as HTMLDivElement;
     this.display = document.getElementById("calcDisplay") as HTMLInputElement;
 
     this.setupTabs();
     this.bindButtons();
-    this.loadHistory();
     this.setupCalculator();
-
-    document.body.addEventListener("click", e => {
-      const el = e.target as HTMLElement;
-      if (el.tagName === "BUTTON") {
-        console.log("BUTTON CLICK:", el.textContent);
-      }
-    });
   }
 
   private setupTabs() {
     const buttons = document.querySelectorAll<HTMLButtonElement>(".tab-btn");
+    const contents = document.querySelectorAll<HTMLElement>(".tab-content");
+
     buttons.forEach(btn => {
       btn.addEventListener("click", () => {
         buttons.forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
 
-        document
-          .querySelectorAll<HTMLElement>(".tab-content")
-          .forEach(tab => tab.classList.remove("active"));
-
+        contents.forEach(c => c.classList.remove("active"));
         const target = document.getElementById(btn.dataset.tab!);
         target?.classList.add("active");
       });
@@ -49,29 +36,24 @@ class EbayCheckerApp {
   }
 
   private bindButtons() {
-    document.getElementById("openCamera")?.addEventListener("click", () => this.openCamera());
-    document.getElementById("closeCamera")?.addEventListener("click", () => this.closeCamera());
-    document.getElementById("flashBtn")?.addEventListener("click", () => this.toggleFlash());
+    const openBtn = document.getElementById("openCamera");
+    const closeBtn = document.getElementById("closeCamera");
+    const flashBtn = document.getElementById("flashBtn");
 
-    document.getElementById("clearHistory")?.addEventListener("click", () => {
-      localStorage.removeItem("ebayHistory");
-      this.historyList.innerHTML = "";
-    });
+    openBtn?.addEventListener("click", () => this.openCamera());
+    closeBtn?.addEventListener("click", () => this.closeCamera());
+    flashBtn?.addEventListener("click", () => this.toggleFlash());
   }
 
   private async openCamera() {
     if (this.stream) return;
 
     try {
-      this.stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
-        audio: false
-      });
-
+      this.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
       this.video.srcObject = this.stream;
       await this.video.play();
       this.track = this.stream.getVideoTracks()[0];
-      this.cameraOverlay.classList.remove("hidden");
+      this.overlay.classList.remove("hidden");
     } catch (err) {
       alert("Camera access failed");
       console.error(err);
@@ -82,12 +64,12 @@ class EbayCheckerApp {
     this.stream?.getTracks().forEach(t => t.stop());
     this.stream = null;
     this.track = null;
-    this.cameraOverlay.classList.add("hidden");
+    this.video.srcObject = null;
+    this.overlay.classList.add("hidden");
   }
 
   private async toggleFlash() {
     if (!this.track) return;
-
     const caps = this.track.getCapabilities?.();
     if (caps?.torch) {
       this.flashOn = !this.flashOn;
@@ -97,25 +79,15 @@ class EbayCheckerApp {
     }
   }
 
-  private loadHistory() {
-    const items = JSON.parse(localStorage.getItem("ebayHistory") || "[]");
-    items.forEach((item: string) => {
-      const li = document.createElement("li");
-      li.textContent = item;
-      this.historyList.appendChild(li);
-    });
-  }
-
   private setupCalculator() {
-    document.querySelectorAll<HTMLButtonElement>(".calc-buttons button")
-      .forEach(btn => {
-        const value = btn.dataset.value;
-        if (value) {
-          btn.addEventListener("click", () => {
-            this.display.value += value;
-          });
-        }
-      });
+    document.querySelectorAll<HTMLButtonElement>(".calc-buttons button").forEach(btn => {
+      const val = btn.dataset.value;
+      if (val) {
+        btn.addEventListener("click", () => {
+          this.display.value += val;
+        });
+      }
+    });
 
     document.getElementById("calcClear")?.addEventListener("click", () => {
       this.display.value = "";
@@ -132,6 +104,5 @@ class EbayCheckerApp {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("EbayCheckerApp booting…");
   new EbayCheckerApp();
 });
