@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "ES2020",
-    "rootDir": "src",
-    "outDir": "dist",
+    "target": "ES2017",
+    "module": "ESNext",
+    "lib": ["DOM", "ES2017"],
+    "outDir": "dist/scripts",
+    "rootDir": "src/scripts",
     "strict": true,
-    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
