@@ -17,14 +17,13 @@
     <section id="scanner" class="tab-content active">
       <button id="openCamera" class="camera-open-btn">Open Camera</button>
 
-      <!-- Result -->
       <div id="scanResult" class="hidden">
-        <img id="capturedImage" />
+        <img id="capturedImage" alt="Captured item" />
         <div class="scan-info">
           <h3>Item Analysis</h3>
-          <p><strong>Detected:</strong> <span id="detectedItem">Unknown Item</span></p>
-          <p><strong>Average Price:</strong> <span id="avgPrice">$0.00</span></p>
-          <p><strong>Price Range:</strong> <span id="priceRange">$0.00 – $0.00</span></p>
+          <p><strong>Detected:</strong> <span id="detectedItem">—</span></p>
+          <p><strong>Average Price:</strong> <span id="avgPrice">—</span></p>
+          <p><strong>Price Range:</strong> <span id="priceRange">—</span></p>
         </div>
       </div>
     </section>
@@ -42,18 +41,22 @@
           <button data-value="8">8</button>
           <button data-value="9">9</button>
           <button data-value="/">÷</button>
+
           <button data-value="4">4</button>
           <button data-value="5">5</button>
           <button data-value="6">6</button>
           <button data-value="*">×</button>
+
           <button data-value="1">1</button>
           <button data-value="2">2</button>
           <button data-value="3">3</button>
           <button data-value="-">−</button>
+
           <button data-value="0">0</button>
           <button data-value=".">.</button>
           <button id="calcClear">C</button>
           <button data-value="+">+</button>
+
           <button id="calcEquals" class="span2">=</button>
         </div>
       </div>
@@ -61,14 +64,13 @@
 
     <!-- Camera Overlay -->
     <div id="cameraOverlay" class="hidden">
-      <video id="camera" autoplay playsinline></video>
-      <canvas id="cameraCanvas"></canvas>
-
-      <div class="camera-ui">
-        <button id="captureBtn">Capture</button>
-        <button id="flashBtn">Flash</button>
-        <button id="closeCamera">Close</button>
+      <div id="cameraFrame">
+        <video id="camera" autoplay playsinline></video>
+        <canvas id="cameraCanvas"></canvas>
       </div>
+      <button id="captureBtn" class="camera-capture-btn">📷</button>
+      <button id="flashBtn" class="camera-small-btn">Flash</button>
+      <button id="closeCamera" class="camera-small-btn">Close</button>
     </div>
   </div>
 

@@ -98,6 +98,4 @@ class EbayCheckerApp {
         });
     }
 }
-document.addEventListener("DOMContentLoaded", () => {
-    new EbayCheckerApp();
-});
+document.addEventListener("DOMContentLoaded", () => new EbayCheckerApp());
