@@ -43,15 +43,19 @@ class EbayCheckerApp {
   }
 
   private async openCamera() {
-    this.stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: "environment" },
-      audio: false
-    });
+    try {
+      this.stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" },
+        audio: false
+      });
 
-    this.video.srcObject = this.stream;
-    await this.video.play();
-    this.track = this.stream.getVideoTracks()[0];
-    this.cameraOverlay.classList.remove("hidden");
+      this.video.srcObject = this.stream;
+      await this.video.play();
+      this.track = this.stream.getVideoTracks()[0];
+      this.cameraOverlay.classList.remove("hidden");
+    } catch {
+      alert("Camera access failed.");
+    }
   }
 
   private closeCamera() {

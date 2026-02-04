@@ -33,14 +33,19 @@ class EbayCheckerApp {
         (_d = document.getElementById("captureBtn")) === null || _d === void 0 ? void 0 : _d.addEventListener("click", () => this.captureImage());
     }
     async openCamera() {
-        this.stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: "environment" },
-            audio: false
-        });
-        this.video.srcObject = this.stream;
-        await this.video.play();
-        this.track = this.stream.getVideoTracks()[0];
-        this.cameraOverlay.classList.remove("hidden");
+        try {
+            this.stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: "environment" },
+                audio: false
+            });
+            this.video.srcObject = this.stream;
+            await this.video.play();
+            this.track = this.stream.getVideoTracks()[0];
+            this.cameraOverlay.classList.remove("hidden");
+        }
+        catch (_a) {
+            alert("Camera access failed.");
+        }
     }
     closeCamera() {
         var _a;
